@@ -19,3 +19,9 @@ eureka:
   instance:
     prefer-ip-address: true
     ip-address: 127.0.0.1
+mybatis:
+  mapper-locations: mappers/**/*.xml
+  type-aliases-package: com.leyou.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
