@@ -25,3 +25,7 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+
+mapper:
+  wrap-keyword: "`{0}`"
+

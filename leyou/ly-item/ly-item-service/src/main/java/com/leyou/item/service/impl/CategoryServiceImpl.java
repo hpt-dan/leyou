@@ -42,4 +42,22 @@ public class CategoryServiceImpl implements CategoryService {
 
         return BeanHelper.copyWithCollection(list, CategoryDTO.class);
     }
+
+
+    /**
+     * 根据品牌的id查询类业务
+     * @param bid
+     * @return
+     */
+    @Override
+    public List<CategoryDTO> queryListByBrandId(Long bid) {
+        List<Category> categories = categoryMapper.queryByBrandId(bid);
+
+        if(CollectionUtils.isEmpty(categories)){
+            throw new LyException(ExceptionEnum.CATEGORY_NOT_FOUND);
+        }
+
+        List<CategoryDTO> categoryDTOS = BeanHelper.copyWithCollection(categories, CategoryDTO.class);
+        return categoryDTOS;
+    }
 }

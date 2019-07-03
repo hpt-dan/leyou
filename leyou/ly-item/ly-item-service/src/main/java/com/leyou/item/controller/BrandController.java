@@ -59,4 +59,12 @@ public class BrandController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+
+    @PutMapping
+    public ResponseEntity<Void> xxx(Brand brand, @RequestParam("cids") List<Long> ids){
+        brandService.updateBrand(brand, ids);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 /**
  * @package: com.leyou.image.controller
  * @version: V1.0
@@ -24,6 +26,10 @@ public class UploadController {
         return ResponseEntity.ok(uploadService.upload(file));
     }
 
+    @GetMapping("signature")
+    public ResponseEntity<Map<String,Object>> getAliSignature(){
+        return ResponseEntity.ok(uploadService.getSignature());
+    }
 
 
 }

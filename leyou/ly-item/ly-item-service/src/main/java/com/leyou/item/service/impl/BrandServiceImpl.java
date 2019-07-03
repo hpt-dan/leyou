@@ -82,4 +82,31 @@ public class BrandServiceImpl implements BrandService {
             throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
     }
+
+    @Override
+    @Transactional
+    public void updateBrand(Brand brand, List<Long> ids) {
+
+        //查询品牌类的中间表要删除的数量
+        int count = brandMapper.queryCountByBrandId(brand.getId());
+
+        //删除品牌类的中间表对应的数据
+        int count1 = brandMapper.deleteCategoryBrand(brand.getId());
+        System.out.println("count1 = " + count1);
+        if(count != count1){
+            throw new LyException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
+
+        //往品牌库中添加数据
+        int i = brandMapper.updateByPrimaryKeySelective(brand);
+        if(i != 1){
+            throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
+
+        //往中间表添加数据
+        int i1 = brandMapper.insertCategoryBrand(brand.getId(), ids);
+        if(i1 != ids.size()){
+            throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
+    }
 }

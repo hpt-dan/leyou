@@ -19,4 +19,6 @@ public interface BrandService {
                                           String key,String sortBy,Boolean desc);
 
     void saveBrand(Brand brand, List<Long> ids);
+
+    void updateBrand(Brand brand, List<Long> ids);
 }

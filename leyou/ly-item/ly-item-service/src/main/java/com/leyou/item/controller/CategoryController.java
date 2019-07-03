@@ -21,4 +21,11 @@ public class CategoryController {
         List<CategoryDTO> categoryDTOS = categoryService.queryListByParent(pid);
         return ResponseEntity.ok(categoryDTOS);
     }
+
+    @GetMapping("of/brand")
+    public ResponseEntity<List<CategoryDTO>> xxx(@RequestParam("id")Long bid){
+
+        List<CategoryDTO> categoryDTOS = categoryService.queryListByBrandId(bid);
+        return ResponseEntity.ok(categoryDTOS);
+    }
 }
