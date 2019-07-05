@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("category")
 public class CategoryController {
@@ -23,7 +24,7 @@ public class CategoryController {
     }
 
     @GetMapping("of/brand")
-    public ResponseEntity<List<CategoryDTO>> xxx(@RequestParam("id")Long bid){
+    public ResponseEntity<List<CategoryDTO>> queryListByBrandId(@RequestParam("id")Long bid){
 
         List<CategoryDTO> categoryDTOS = categoryService.queryListByBrandId(bid);
         return ResponseEntity.ok(categoryDTOS);

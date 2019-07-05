@@ -61,9 +61,11 @@ public class SpecServiceImpl implements SpecService {
      * @return
      */
     @Override
-    public List<SpecParamDTO> querySpecParams(Long gid) {
+    public List<SpecParamDTO> querySpecParams(Long gid,Long cid) {
+
         SpecParam specParam = new SpecParam();
         specParam.setGroupId(gid);
+        specParam.setCid(cid);
 
         List<SpecParam> list = specParamMapper.select(specParam);
 
@@ -72,4 +74,8 @@ public class SpecServiceImpl implements SpecService {
         }
         return BeanHelper.copyWithCollection(list, SpecParamDTO.class);
     }
+
+
+
+
 }

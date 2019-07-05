@@ -10,4 +10,6 @@ public interface CategoryService {
 
     List<CategoryDTO> queryListByBrandId(Long bid);
 
+    List<CategoryDTO> queryCategoryByIds(List<Long> ids);
+
 }

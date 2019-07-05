@@ -17,7 +17,7 @@ import java.util.List;
  * @version: V1.0
  * @author: Administrator
  * @date: 2019/4/21 22:12
- * @description:
+ * @description:品牌模块
  */
 @RestController
 @RequestMapping("brand")
@@ -60,11 +60,28 @@ public class BrandController {
     }
 
 
+    /**
+     * 更新品牌信息
+     * @param brand
+     * @param ids
+     * @return
+     */
     @PutMapping
-    public ResponseEntity<Void> xxx(Brand brand, @RequestParam("cids") List<Long> ids){
+    public ResponseEntity<Void> updateBrand(Brand brand, @RequestParam("cids") List<Long> ids){
         brandService.updateBrand(brand, ids);
-
         return ResponseEntity.ok().build();
     }
+
+
+    /**
+     * 根据类的id的查询品爱信息
+     * @param id
+     * @return
+     */
+    @GetMapping("of/category")
+    public ResponseEntity<List<BrandDTO>> queryByCategoryId(@RequestParam("id")Long id){
+        return ResponseEntity.ok(brandService.queryByCategoryId(id));
+    }
+
 
 }

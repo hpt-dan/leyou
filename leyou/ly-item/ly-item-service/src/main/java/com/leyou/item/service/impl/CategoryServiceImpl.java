@@ -60,4 +60,20 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryDTO> categoryDTOS = BeanHelper.copyWithCollection(categories, CategoryDTO.class);
         return categoryDTOS;
     }
+
+
+    /**
+     * 根据类得id集合，查询类得名字
+     * @param ids
+     * @return
+     */
+    @Override
+    public List<CategoryDTO> queryCategoryByIds(List<Long> ids){
+        List<Category> list = categoryMapper.selectByIdList(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            // 没找到，返回404
+            throw new LyException(ExceptionEnum.CATEGORY_NOT_FOUND);
+        }
+        return BeanHelper.copyWithCollection(list, CategoryDTO.class);
+    }
 }

@@ -21,4 +21,8 @@ public interface BrandService {
     void saveBrand(Brand brand, List<Long> ids);
 
     void updateBrand(Brand brand, List<Long> ids);
+
+    BrandDTO queryById(Long id);
+
+    List<BrandDTO> queryByCategoryId(Long id);
 }

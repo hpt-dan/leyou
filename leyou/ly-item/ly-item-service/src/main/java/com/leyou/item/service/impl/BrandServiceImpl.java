@@ -109,4 +109,34 @@ public class BrandServiceImpl implements BrandService {
             throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
     }
+
+    /**
+     * 根据品牌得id查询品牌得名字
+     * @param id
+     * @return
+     */
+    @Override
+    public BrandDTO queryById(Long id) {
+        Brand brand = brandMapper.selectByPrimaryKey(id);
+        if (brand == null) {
+            throw new LyException(ExceptionEnum.BRAND_NOT_FOUND);
+        }
+        return BeanHelper.copyProperties(brand, BrandDTO.class);
+    }
+
+    /**
+     * 根据类的id查询对应的品牌集合业务
+     * @param id
+     * @return
+     */
+    @Override
+    public List<BrandDTO> queryByCategoryId(Long id) {
+        List<Brand> brandS = brandMapper.queryByCategoryId(id);
+
+        if (CollectionUtils.isEmpty(brandS)) {
+            throw new LyException(ExceptionEnum.BRAND_NOT_FOUND);
+        }
+
+        return BeanHelper.copyWithCollection(brandS, BrandDTO.class);
+    }
 }

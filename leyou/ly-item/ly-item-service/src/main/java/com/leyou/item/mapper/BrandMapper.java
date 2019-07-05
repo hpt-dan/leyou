@@ -1,6 +1,7 @@
 package com.leyou.item.mapper;
 
 import com.leyou.item.pojo.Brand;
+import com.leyou.item.pojo.BrandDTO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -35,4 +36,11 @@ public interface BrandMapper extends Mapper<Brand> {
      */
     @Delete("DELETE from tb_category_brand WHERE brand_id = #{bid}")
     int deleteCategoryBrand(@Param("bid")Long bid);
+
+    /**
+     * 根据类的id查询对应的品牌集合
+     * @param id
+     */
+    @Select("SELECT bb.* from tb_brand bb INNER JOIN tb_category_brand tc ON bb.id = tc.brand_id WHERE tc.category_id = #{id}")
+    List<Brand> queryByCategoryId(@Param("id") Long id);
 }

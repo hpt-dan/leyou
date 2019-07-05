@@ -14,7 +14,8 @@ public enum ExceptionEnum {
     INVALID_FILE_TYPE(500, "上传失败，请稍后再试"),
     UPDATE_OPERATION_FAIL(500,"上传失败"),
     CATEGORY_NOT_FOUND(500,"品牌信息错误"),
-    DELETE_OPERATION_FAIL(500,"删除失败")
+    DELETE_OPERATION_FAIL(500,"删除失败"),
+    GOODS_NOT_FOUND(204,"没有找到商品")
     ;
    
     private int status;
