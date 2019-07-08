@@ -29,7 +29,7 @@
             </v-flex>
             <v-flex>
               <v-upload v-model="brand.image" :multiple="false" :pic-width="250" :pic-height="90"
-                        url="/upload/image"/>
+                        url="/upload/signature" need-signature/>
             </v-flex>
           </v-layout>
         </v-container>
