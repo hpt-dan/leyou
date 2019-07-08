@@ -83,5 +83,25 @@ public class BrandController {
         return ResponseEntity.ok(brandService.queryByCategoryId(id));
     }
 
+    /**
+     * 根据id查询品牌
+     * @param id
+     * @return
+     */
+    @GetMapping("{id}")
+    public ResponseEntity<BrandDTO> queryById(@PathVariable("id") Long id){
+        BrandDTO brand = brandService.queryById(id);
+        return ResponseEntity.ok(brand);
+    }
 
+
+    /**
+     * 根据多个id查询品牌
+     * @param ids
+     * @return
+     */
+    @GetMapping("list")
+    public ResponseEntity<List<BrandDTO>> queryBrandByIds(@RequestParam("ids") List<Long> ids){
+        return ResponseEntity.ok(this.brandService.queryBrandByIds(ids));
+    }
 }

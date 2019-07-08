@@ -15,7 +15,10 @@ public enum ExceptionEnum {
     UPDATE_OPERATION_FAIL(500,"上传失败"),
     CATEGORY_NOT_FOUND(500,"品牌信息错误"),
     DELETE_OPERATION_FAIL(500,"删除失败"),
-    GOODS_NOT_FOUND(204,"没有找到商品")
+    GOODS_NOT_FOUND(204,"没有找到商品"),
+    INVALID_PARAM_ERROR(400,"数据有问题"),
+    INVALID_PARAM(500,"输入搜索条件错误"),
+    GOODS_NOT_FOND(204,"没有此产品")
     ;
    
     private int status;

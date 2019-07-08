@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leyou.item.mapper.BrandMapper">
+
+    <insert id="insertCategoryBrand">
+        INSERT INTO tb_category_brand (category_id, brand_id)
+        <foreach collection="ids" open="VALUES" separator="," item="id">
+            (#{id}, #{bid})
+        </foreach>
+    </insert>
+</mapper>

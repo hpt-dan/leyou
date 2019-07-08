@@ -1,11 +1,16 @@
 package com.leyou.item.controller;
 
 import com.leyou.common.pojo.PageResult;
+import com.leyou.item.pojo.SkuDTO;
 import com.leyou.item.pojo.SpuDTO;
+import com.leyou.item.pojo.SpuDetailDTO;
 import com.leyou.item.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @package: com.leyou.item.controller
@@ -39,8 +44,6 @@ public class GoodsController {
     }
 
 
-
-
     /**
      * 插入商品
      * @param spuDTO
@@ -52,4 +55,52 @@ public class GoodsController {
            goodsService.saveGoods(spuDTO);
         return ResponseEntity.ok().build();
     }
+
+
+    /**
+     * spu的id查询SpuDetailDTO
+     * @param id
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity<SpuDetailDTO> querySpuDetailById(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(goodsService.querySpuDetailById(id));
+    }
+
+    /**
+     * 根据spuID查询sku
+     * @param id spuID
+     * @return sku的集合
+     */
+    @GetMapping("sku/of/spu")
+    public ResponseEntity<List<SkuDTO>> querySkuBySpuId(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(this.goodsService.querySkuListBySpuId(id));
+    }
+
+    /**
+     * 修改商品
+     * @param spu
+     * @return
+     */
+    @PutMapping("goods")
+    public ResponseEntity<Void> updateGoods(@RequestBody SpuDTO spu) {
+        goodsService.updateGoods(spu);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
+    /**
+     * 更改商品的上架与下架
+     * @param id
+     * @param saleable
+     * @return
+     */
+    @PutMapping("/spu/saleable")
+    public ResponseEntity<Void> updateSpuSaleable(@RequestParam("id") Long id, @RequestParam("saleable") Boolean saleable) {
+        goodsService.updateSaleable(id, saleable);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }

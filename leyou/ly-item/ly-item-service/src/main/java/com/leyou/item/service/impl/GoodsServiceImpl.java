@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -150,6 +149,106 @@ public class GoodsServiceImpl implements GoodsService {
         count = skuMapper.insertList(skuList);
         if (count != skuList.size()) {
             throw new LyException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
+    }
+
+
+    /**
+     * spu的id查询SpuDetailDTO
+     * @param id
+     * @return
+     */
+    @Override
+    public SpuDetailDTO querySpuDetailById(Long id) {
+
+        SpuDetail spuDetail = detailMapper.selectByPrimaryKey(id);
+        if (spuDetail == null) {
+            throw new LyException(ExceptionEnum.GOODS_NOT_FOUND);
+        }
+        return BeanHelper.copyProperties(spuDetail, SpuDetailDTO.class);
+    }
+
+
+    @Override
+    public List<SkuDTO> querySkuListBySpuId(Long id) {
+        Sku s = new Sku();
+        s.setSpuId(id);
+        List<Sku> list = skuMapper.select(s);
+        if (CollectionUtils.isEmpty(list)) {
+            throw new LyException(ExceptionEnum.GOODS_NOT_FOUND);
+        }
+        return BeanHelper.copyWithCollection(list, SkuDTO.class);
+    }
+
+    /**
+     * 更改商品
+     * @param spuDTO
+     */
+    @Override
+    public void updateGoods(SpuDTO spuDTO) {
+
+        //1：删除sku，然后加入新的sku
+        //2:直接修改spu
+
+        Long spuId = spuDTO.getId();
+        if (spuId == null) {
+            // 请求参数有误
+            throw new LyException(ExceptionEnum.INVALID_PARAM_ERROR);
+        }
+        // 1.删除sku
+        Sku sku = new Sku();
+        sku.setSpuId(spuId);
+        // 查询数量
+        int size = skuMapper.selectCount(sku);
+        if(size > 0) {
+            // 删除
+            int count = skuMapper.delete(sku);
+            if(count != size){
+                throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+            }
+        }
+
+        // 2.更新spu
+        Spu spu = BeanHelper.copyProperties(spuDTO, Spu.class);
+        int count = spuMapper.updateByPrimaryKeySelective(spu);
+        if (count != 1) {
+            throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+
+        // 3.更新spuDetail
+        SpuDetail spuDetail = BeanHelper.copyProperties(spuDTO.getSpuDetail(), SpuDetail.class);
+        spuDetail.setSpuId(spuId);
+        count = detailMapper.updateByPrimaryKeySelective(spuDetail);
+        if (count != 1) {
+            throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+
+        // 4.新增sku
+        List<SkuDTO> dtoList = spuDTO.getSkus();
+        // 处理dto
+        List<Sku> skuList = dtoList.stream().map(dto -> {
+            dto.setEnable(false);
+            // 添加spu的id
+            dto.setSpuId(spuId);
+            return BeanHelper.copyProperties(dto, Sku.class);
+        }).collect(Collectors.toList());
+        count = skuMapper.insertList(skuList);
+        if (count != skuList.size()) {
+            throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+    }
+
+
+    @Override
+    public void updateSaleable(Long id, Boolean saleable) {
+
+        //更新spu
+        Spu spu = new Spu();
+        spu.setId(id);
+        spu.setSaleable(saleable);
+        int count = spuMapper.updateByPrimaryKeySelective(spu);
+        if (count != 1) {
+            throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
     }
 }

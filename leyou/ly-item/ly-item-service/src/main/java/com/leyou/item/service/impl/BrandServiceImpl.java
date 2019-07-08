@@ -139,4 +139,13 @@ public class BrandServiceImpl implements BrandService {
 
         return BeanHelper.copyWithCollection(brandS, BrandDTO.class);
     }
+
+    public List<BrandDTO> queryBrandByIds(List<Long> ids) {
+        List<Brand> list = brandMapper.selectByIdList(ids);
+        // 判断是否为空
+        if(CollectionUtils.isEmpty(list)){
+            throw new LyException(ExceptionEnum.BRAND_NOT_FOUND);
+        }
+        return BeanHelper.copyWithCollection(list, BrandDTO.class);
+    }
 }
