@@ -44,12 +44,24 @@ public class SpecController {
      */
     @GetMapping("params")
     public ResponseEntity<List<SpecParamDTO>> querySpecParams(@RequestParam(value = "gid",required = false) Long gid,
-                                                              @RequestParam(value = "cid",required = false) Long cid
+                                                              @RequestParam(value = "cid",required = false) Long cid,
+                                                              @RequestParam(value = "searching",required = false)Boolean searching
     ) {
 
-        List<SpecParamDTO> specParamDTOS = specService.querySpecParams(gid, cid);
+        List<SpecParamDTO> specParamDTOS = specService.querySpecParams(gid, cid,searching);
         return ResponseEntity.ok(specParamDTOS);
     }
 
+    /**
+     * 查询规格参数组，及组内参数
+     *
+     * @param cid 商品分类id
+     * @return 规格组及组内参数
+     */
+    @GetMapping("of/category")
+    public ResponseEntity<List<SpecGroupDTO>> querySpecsByCid(@RequestParam("id") Long cid) {
 
+        return ResponseEntity.ok(specService.querySpecsByCid(cid));
+
+    };
 }

@@ -104,4 +104,6 @@ public class BrandController {
     public ResponseEntity<List<BrandDTO>> queryBrandByIds(@RequestParam("ids") List<Long> ids){
         return ResponseEntity.ok(this.brandService.queryBrandByIds(ids));
     }
+
+
 }

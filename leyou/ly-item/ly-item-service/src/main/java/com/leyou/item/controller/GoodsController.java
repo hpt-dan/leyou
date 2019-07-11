@@ -62,7 +62,7 @@ public class GoodsController {
      * @param id
      * @return
      */
-    @GetMapping
+    @GetMapping("spu/detail")
     public ResponseEntity<SpuDetailDTO> querySpuDetailById(@RequestParam("id") Long id) {
         return ResponseEntity.ok(goodsService.querySpuDetailById(id));
     }
@@ -101,6 +101,15 @@ public class GoodsController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 根据spu的id查询spu,包含spuDtail,skus
+     * @param id
+     * @return
+     */
+    @GetMapping("spu/{id}")
+    public ResponseEntity<SpuDTO> querySpuById(@PathVariable("id")Long id){
 
+        return ResponseEntity.ok(goodsService.querySpuById(id));
+    }
 
 }

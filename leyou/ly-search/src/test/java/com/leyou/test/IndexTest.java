@@ -1,11 +1,9 @@
 package com.leyou.test;
 
 import com.leyou.LySearchApplication;
-import com.leyou.common.enums.ExceptionEnum;
-import com.leyou.common.exception.LyException;
 import com.leyou.common.pojo.PageResult;
+import com.leyou.item.client.ItemClient;
 import com.leyou.item.pojo.SpuDTO;
-import com.leyou.search.client.ItemClient;
 import com.leyou.search.pojo.Goods;
 import com.leyou.search.repository.GoodsRepository;
 import com.leyou.search.service.IndexService;

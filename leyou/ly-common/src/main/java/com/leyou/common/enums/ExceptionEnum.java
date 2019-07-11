@@ -18,7 +18,9 @@ public enum ExceptionEnum {
     GOODS_NOT_FOUND(204,"没有找到商品"),
     INVALID_PARAM_ERROR(400,"数据有问题"),
     INVALID_PARAM(500,"输入搜索条件错误"),
-    GOODS_NOT_FOND(204,"没有此产品")
+    GOODS_NOT_FOND(204,"没有此产品"),
+    DIRECTORY_WRITER_ERROR(204,"目录找不到"),
+    FILE_WRITER_ERROR(500,"页面生成失败")
     ;
    
     private int status;

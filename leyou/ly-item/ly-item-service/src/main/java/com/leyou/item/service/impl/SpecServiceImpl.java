@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @package: com.leyou.item.service.impl
@@ -61,11 +64,12 @@ public class SpecServiceImpl implements SpecService {
      * @return
      */
     @Override
-    public List<SpecParamDTO> querySpecParams(Long gid,Long cid) {
+    public List<SpecParamDTO> querySpecParams(Long gid,Long cid,Boolean searching) {
 
         SpecParam specParam = new SpecParam();
         specParam.setGroupId(gid);
         specParam.setCid(cid);
+        specParam.setSearching(searching);
 
         List<SpecParam> list = specParamMapper.select(specParam);
 
@@ -75,7 +79,27 @@ public class SpecServiceImpl implements SpecService {
         return BeanHelper.copyWithCollection(list, SpecParamDTO.class);
     }
 
+    /**
+     * 根据分类的id查询规格参数组，和规格参数
+     * @param cid
+     * @return
+     */
+    @Override
+    public List<SpecGroupDTO> querySpecsByCid(Long cid) {
 
 
+        // 查询规格组
+        List<SpecGroupDTO> groupList = queryGroupByCategoryId(cid);
+        // 查询分类下所有规格参数
+        List<SpecParamDTO> params = querySpecParams(null, cid, null);
+        // 将规格参数按照groupId进行分组，得到每个group下的param的集合
+        Map<Long, List<SpecParamDTO>> paramMap = params.stream()
+                .collect(Collectors.groupingBy(SpecParamDTO::getGroupId));
+        // 填写到group中
+        for (SpecGroupDTO groupDTO : groupList) {
+            groupDTO.setParams(paramMap.get(groupDTO.getId()));
+        }
+        return groupList;
+    }
 
 }

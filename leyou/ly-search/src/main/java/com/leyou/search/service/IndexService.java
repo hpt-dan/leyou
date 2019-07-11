@@ -3,9 +3,10 @@ package com.leyou.search.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.leyou.common.utils.BeanHelper;
 import com.leyou.common.utils.JsonUtils;
+import com.leyou.item.client.ItemClient;
 import com.leyou.item.pojo.*;
-import com.leyou.search.client.ItemClient;
 import com.leyou.search.pojo.Goods;
+import com.leyou.search.repository.GoodsRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class IndexService {
 
     @Autowired
     private ItemClient itemClient;
+
+    @Autowired
+    private GoodsRepository goodsRepository;
 
     /**
      * 数据转换的逻辑
@@ -155,5 +159,27 @@ public class IndexService {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+
+    /**
+     * 根据spuID创建对用goods的索引到索引库中
+     * @param id
+     */
+    public void createIndex(Long id) {
+
+        SpuDTO spuDTO = this.itemClient.querySpuById(id);
+        Goods goods = buildGoods(spuDTO);
+        goodsRepository.save(goods);
+
+    }
+
+
+    /**
+     * 根据spuId从索引库中删除对应的索引
+     * @param id
+     */
+    public void deleteById(Long id) {
+        goodsRepository.deleteById(id);
     }
 }

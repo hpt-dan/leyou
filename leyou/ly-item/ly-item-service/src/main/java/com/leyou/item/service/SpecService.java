@@ -9,7 +9,8 @@ public interface SpecService {
 
     List<SpecGroupDTO> queryGroupByCategoryId(Long id);
 
-    List<SpecParamDTO> querySpecParams(Long id, Long cid);
+    List<SpecParamDTO> querySpecParams(Long id, Long cid,Boolean searching);
 
 
+    List<SpecGroupDTO> querySpecsByCid(Long cid);
 }

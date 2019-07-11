@@ -20,4 +20,5 @@ public interface GoodsService {
 
     void updateSaleable(Long id, Boolean saleable);
 
+    SpuDTO querySpuById(Long id);
 }

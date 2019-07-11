@@ -1,10 +1,12 @@
-package com.leyou.search.client;
+package com.leyou.item.client;
 
 
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.pojo.*;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -70,5 +72,33 @@ public interface ItemClient {
      */
     @GetMapping("brand/list")
     List<BrandDTO> queryBrandByIds(@RequestParam("ids") List<Long> idList);
+
+
+    /**
+     * 根据spu的id查询spu,包含spuDtail,skus
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("spu/{id}")
+    SpuDTO querySpuById(@PathVariable("id") Long id);
+
+    /**
+     * 查询规格参数组，及组内参数
+     *
+     * @param cid 商品分类id
+     * @return 规格组及组内参数
+     */
+    @GetMapping("spec/of/category")
+    List<SpecGroupDTO> querySpecsByCid(@RequestParam("id") Long cid);
+
+    /**
+     * 根据id查询品牌
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("brand/{id}")
+    BrandDTO queryById(@PathVariable("id") Long id);
 
 }

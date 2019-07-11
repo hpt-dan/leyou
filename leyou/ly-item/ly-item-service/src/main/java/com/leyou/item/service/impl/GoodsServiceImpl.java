@@ -14,6 +14,7 @@ import com.leyou.item.service.BrandService;
 import com.leyou.item.service.CategoryService;
 import com.leyou.item.service.GoodsService;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,10 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.leyou.common.constants.MQConstants.Exchange.ITEM_EXCHANGE_NAME;
+import static com.leyou.common.constants.MQConstants.RoutingKey.ITEM_DOWN_KEY;
+import static com.leyou.common.constants.MQConstants.RoutingKey.ITEM_UP_KEY;
 
 /**
  * @package: com.leyou.item.service.impl
@@ -169,6 +174,11 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
 
+    /**
+     * 根据spuId查询sku集合
+     * @param id
+     * @return
+     */
     @Override
     public List<SkuDTO> querySkuListBySpuId(Long id) {
         Sku s = new Sku();
@@ -239,6 +249,13 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+    /**
+     * 商品的上下架
+     * @param id
+     * @param saleable
+     */
     @Override
     public void updateSaleable(Long id, Boolean saleable) {
 
@@ -250,5 +267,28 @@ public class GoodsServiceImpl implements GoodsService {
         if (count != 1) {
             throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
+
+        //根据商品的上下架，发送信息给消息队列
+        String key = saleable ? ITEM_UP_KEY : ITEM_DOWN_KEY;
+        amqpTemplate.convertAndSend(ITEM_EXCHANGE_NAME, key, id);
+    }
+
+
+    /**
+     * 根据spu的id查询spu,包含spuDtail,skus
+     * @param id
+     * @return
+     */
+    @Override
+    public SpuDTO querySpuById(Long id) {
+        Spu spu = spuMapper.selectByPrimaryKey(id);
+        SpuDTO spuDTO = BeanHelper.copyProperties(spu, SpuDTO.class);
+
+        //在spu中封装spuDtail
+        spuDTO.setSpuDetail(querySpuDetailById(id));
+
+        spuDTO.setSkus(querySkuListBySpuId(id));
+
+        return spuDTO;
     }
 }
