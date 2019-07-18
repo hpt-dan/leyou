@@ -1,0 +1,36 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/heima70
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+
+
+mybatis:
+  type-aliases-package: com.leyou.order.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+ly:
+  jwt:
+    pubKeyPath: D:/heima/rsa/id_rsa.pub # D:/heima/rsa/id_rsa.pub # 公钥地址
+    user:
+      cookieName: LY_TOKEN # cookie名称
+    app:
+      id: 6 # 服务id
+      secret: ${spring.application.name} # 服务密钥，默认是服务的名称
+      headerName: privilege_header
+
+
+  worker:
+    workerId: 1
+    dataCenterId: 1

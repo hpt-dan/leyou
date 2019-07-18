@@ -1,0 +1,65 @@
+server:
+  port: 8087
+
+
+spring:
+  application:
+    name: auth-service
+  redis:
+      host: 192.168.11.128
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/heima70?allowMultiQueries=true
+    username: root
+    password: root
+
+
+mybatis:
+  type-aliases-package: com.leyou.auth.entity
+  mapper-locations: mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+logging:
+  level:
+    com.leyou: trace
+
+
+mapper:
+  wrap-keyword: "`{0}`"
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
+
+
+
+ly:
+  jwt:
+    pubKeyPath: D:/heima/rsa/id_rsa.pub # D:/heima/rsa/id_rsa.pub # 公钥地址
+    priKeyPath: D:/heima/rsa/id_rsa # D:/heima/rsa/id_rsa # 私钥地址
+    user:
+      expire: 30 # 过期时间,单位分钟
+      cookieName: LY_TOKEN # cookie名称
+      cookieDomain: leyou.com # cookie的域
+    app:
+     id: 10 # 服务id
+     expire: 1500  #服务token的过期时间单位分钟
+     secret: ${spring.application.name} # 服务密钥，默认是服务的名称
+     headerName: privilege_header
+
+
+
+
+
+  encoder:
+    crypt:
+      secret: ${random.uuid}
+      strength: 10
+

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @package: com.leyou.item.controller
@@ -112,4 +113,26 @@ public class GoodsController {
         return ResponseEntity.ok(goodsService.querySpuById(id));
     }
 
+
+    /**
+     * 无状态购物车的查询
+     * @param ids
+     * @return
+     */
+    @GetMapping("sku/list")
+    public ResponseEntity<List<SkuDTO>> querySkuByIds(@RequestParam("ids") List<Long> ids){
+
+        return ResponseEntity.ok(goodsService.querySkuByIds(ids));
+    }
+
+
+    /**
+     * 减库存
+     * @param cartMap 商品id及数量的map  两个参数，skuId，要减的数量
+     */
+    @PutMapping("/stock/minus")
+    public ResponseEntity<Void> minusStock(@RequestBody Map<Long, Integer> cartMap){
+        goodsService.minusStock(cartMap);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

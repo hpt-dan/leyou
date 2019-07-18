@@ -23,6 +23,7 @@ import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.leyou.common.constants.MQConstants.Exchange.ITEM_EXCHANGE_NAME;
@@ -290,5 +291,43 @@ public class GoodsServiceImpl implements GoodsService {
         spuDTO.setSkus(querySkuListBySpuId(id));
 
         return spuDTO;
+    }
+
+
+    /**
+     * 根据sku的id集合查询SkuDTO。
+     * @param ids
+     * @return
+     */
+    @Override
+    public List<SkuDTO> querySkuByIds(List<Long> ids) {
+
+        List<Sku> skus = skuMapper.selectByIdList(ids);
+        return BeanHelper.copyWithCollection(skus, SkuDTO.class);
+
+    }
+
+    /**
+     * 下单后减去商品更改商品的库存
+     * @param cartMap
+     */
+    @Override
+    public void minusStock(Map<Long, Integer> cartMap) {
+
+        cartMap.entrySet().forEach(cart->{
+            Long skuId = cart.getKey();
+            Integer num  = cart.getValue();
+            Sku sku = skuMapper.selectByPrimaryKey(skuId);
+            sku.setId(skuId);
+
+            Integer storeNum = sku.getStock() - num;
+            if(storeNum < 0){
+                //库存不足
+                throw new LyException(ExceptionEnum.STOCK_NOT_ENOUGH);
+            }
+            sku.setStock(storeNum);
+
+            this.skuMapper.updateByPrimaryKeySelective(sku);
+        });
     }
 }

@@ -5,11 +5,10 @@ import com.leyou.common.pojo.PageResult;
 import com.leyou.item.pojo.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient("item-service")
 public interface ItemClient {
@@ -100,5 +99,26 @@ public interface ItemClient {
      */
     @GetMapping("brand/{id}")
     BrandDTO queryById(@PathVariable("id") Long id);
+
+
+
+
+
+    /**
+     * 根据skuIDs查询sku集合
+     * @param ids
+     * @return
+     */
+    @GetMapping("sku/list")
+    List<SkuDTO> querySkuByIds(@RequestParam("ids") List<Long> ids);
+
+
+    /**
+     * 减库存
+     * @param cartMap 商品id及数量的map  两个参数，skuId，要减的数量
+     */
+    @PutMapping("/stock/minus")
+    Void minusStock(@RequestBody Map<Long, Integer> cartMap);
+
 
 }

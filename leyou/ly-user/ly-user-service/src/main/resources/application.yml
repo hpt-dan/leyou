@@ -1,0 +1,52 @@
+server:
+  port: 8085
+
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/heima70
+    username: root
+    password: root
+
+  redis:
+    host: 192.168.11.128
+  rabbitmq:
+    host: 192.168.11.128
+    username: leyou
+    password: leyou
+    virtual-host: /leyou
+
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+
+  instance:
+    ip-address: 127.0.0.1
+    prefer-ip-address: true
+
+mybatis:
+  type-aliases-package: com.leyou.user.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+ly:
+  encoder:
+    crypt:
+      secret: ${random.uuid} # 随机的密钥，使用uuid
+      strength: 10 # 加密强度4~31，决定了密码和盐加密时的运算次数，超过10以后加密耗时会显著增加
+
+  jwt:
+    pubKeyPath: D:/heima/rsa/id_rsa.pub # 公钥地址
+    app:
+      id: 1 # 服务id
+      secret: ${spring.application.name} # 服务密钥，默认是服务的名称
+      headerName: privilege_header

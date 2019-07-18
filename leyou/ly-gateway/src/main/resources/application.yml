@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  redis:
+    host: 192.168.11.128
 
 
 eureka:
@@ -18,6 +20,14 @@ zuul:
     item-service: /item/** # 将商品微服务映射到/item/**
     upload-service: /upload/**
     search-service: /search/**
+    user-service: /user/**
+    auth-service: /auth/**
+    cart-service: /cart/**
+    order-service:
+      path: /order/**
+      serviceId: order-service
+      strip-prefix: false
+  sensitive-headers:
 
 
 hystrix:
@@ -55,3 +65,20 @@ ly:
       - HEAD
     maxAge: 3600
     filterPath: "/**"
+  jwt:
+    pubKeyPath: D:/heima/rsa/id_rsa.pub # D:/heima/rsa/id_rsa.pub # 公钥地址
+    user:
+      cookieName: LY_TOKEN # cookie名称
+    app:
+      id: 7 # 服务id
+      secret: ${spring.application.name} # 服务密钥，默认是服务的名称
+      headerName: privilege_header
+  filter:
+    allowPaths:
+      - /api/auth/login
+      - /api/auth/verify
+      - /api/search
+      - /api/user/register
+      - /api/user/check
+      - /api/user/code
+      - /api/item
