@@ -17,15 +17,22 @@ import com.leyou.order.interceptor.UserInterceptor;
 import com.leyou.order.mapper.OrderDetailMapper;
 import com.leyou.order.mapper.OrderLogisticsMapper;
 import com.leyou.order.mapper.OrderMapper;
+import com.leyou.order.utils.PayHelper;
 import com.leyou.user.client.UserClient;
 import com.leyou.user.dto.AddressDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +43,7 @@ import java.util.stream.Collectors;
  * @description:
  */
 @Service
+@Slf4j
 public class OrderService {
 
 
@@ -59,7 +67,7 @@ public class OrderService {
     private OrderLogisticsMapper orderLogisticsMapper;
 
 
-    public void createOrder(OrderDTO orderDTO) {
+    public Long createOrder(OrderDTO orderDTO) {
 
         long orderId = idWorker.nextId();
 
@@ -131,5 +139,175 @@ public class OrderService {
         //修改库存
         itemClient.minusStock(cartsMap);
 
+        return orderId;
+
+    }
+
+    /**
+     * 根据订单id查询订单
+     * @param orderId
+     * @return
+     */
+    public Order queryOrderById(Long orderId) {
+
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(null == order){
+            throw new LyException(ExceptionEnum.ORDER_NOT_FOND);
+        }
+        return order;
+    }
+
+
+    @Autowired
+    private PayHelper payHelper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    /**
+     * 生成二维码的URL
+     * @param orderId
+     * @return
+     */
+    public String createPayUrl(Long orderId) {
+        // 先看是否已经生成过：
+        String key = "ly.pay.url." + orderId;
+        String cacheUrl = redisTemplate.opsForValue().get(key);
+        if (StringUtils.isNoneBlank(cacheUrl)) {
+            return cacheUrl;
+        }
+        // 查询订单
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null){
+            throw new LyException(ExceptionEnum.ORDER_NOT_FOUND);
+        }
+        // 判断订单状态
+        Integer status = order.getStatus();
+        if(!status.equals(OrderStatusEnum.INIT.value())){
+            // 订单已经支付过了，订单状态异常
+            throw new LyException(ExceptionEnum.INVALID_ORDER_STATUS);
+        }
+        // 支付金额，测试时写1
+        Long actualPay = /*order.getActualPay()*/ 1L;
+
+        // 商品描述
+        String desc = "【乐优商城】商品信息";
+        String url = payHelper.createOrder(orderId, actualPay, desc);
+
+        // 存入redis，设置有效期为 2小时
+        redisTemplate.opsForValue().set(key, url, 2, TimeUnit.HOURS);
+        return url;
+    }
+
+
+    /**
+     * 支付成功，威胁你服务回调的函数
+     * @param result
+     */
+    @Transactional
+    public void handleNotify(Map<String, String> result) {
+        // 1 签名校验
+        try {
+            payHelper.isValidSign(result);
+        }catch (Exception e){
+            log.error("【微信回调】微信签名有误！, result: {}",result, e);
+            throw new LyException(ExceptionEnum.INVALID_NOTIFY_SIGN, e);
+        }
+        // 2、业务校验
+        payHelper.checkResultCode(result);
+
+        // 3 校验金额数据
+        String totalFeeStr = result.get("total_fee");
+        String tradeNo = result.get("out_trade_no");
+        if(StringUtils.isEmpty(totalFeeStr) || StringUtils.isEmpty(tradeNo)){
+            // 回调参数中必须包含订单编号和订单金额
+            throw new LyException(ExceptionEnum.INVALID_NOTIFY_PARAM);
+        }
+        // 3.1 获取结果中的金额
+        long totalFee = Long.valueOf(totalFeeStr);
+        // 3.2 获取订单
+        Long orderId = Long.valueOf(tradeNo);
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        // 3.3.判断订单的状态，保证幂等
+        if(!order.getStatus().equals(OrderStatusEnum.INIT.value())){
+            // 订单已经支付，返回成功
+            return;
+        }
+        // 3.4.判断金额是否一致
+        if(totalFee != /*order.getActualPay()*/ 1){
+            // 金额不符
+            throw new LyException(ExceptionEnum.INVALID_NOTIFY_PARAM);
+        }
+
+        // 4 修改订单状态
+        Order orderStatus = new Order();
+        orderStatus.setStatus(OrderStatusEnum.PAY_UP.value());
+        orderStatus.setOrderId(orderId);
+        orderStatus.setPayTime(new Date());
+        int count = orderMapper.updateByPrimaryKeySelective(orderStatus);
+        if(count != 1){
+            log.error("【微信回调】更新订单状态失败，订单id：{}", orderId);
+            throw new LyException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+        log.info("【微信回调】, 订单支付成功! 订单编号:{}", orderId);
+    }
+
+
+    /**
+     * 查询用户支付状态
+     * @param orderId
+     * @return
+     */
+    public Integer queryPayStatus(Long orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if(order == null){
+            throw new LyException(ExceptionEnum.ORDER_NOT_FOUND);
+        }
+        return order.getStatus();
+    }
+
+
+    /**
+     * 根据订单未支付状态，查询订单
+     * @param status
+     * @return
+     */
+    public List<Order> queryOrderByState(Integer status){
+        Order order = new Order();
+        order.setStatus(status);
+
+        List<Order> orders = orderMapper.select(order);
+        if(orders == null){
+            throw new LyException(ExceptionEnum.ORDER_NOT_FOND);
+        }
+        return orders;
+    }
+
+
+    /**
+     * 更改订单的状态
+     * @param outtimeOrders
+     */
+    public void updateStatus(List<Order> outtimeOrders) {
+        for (Order outtimeOrder : outtimeOrders) {
+            outtimeOrder.setStatus(5);
+            orderMapper.updateByPrimaryKeySelective(outtimeOrder);
+        }
+    }
+
+    /**
+     * 根据订单的id集合查询对应的OrderDetail集合
+     * @param orderIdS
+     * @return
+     */
+    public List<OrderDetail> queryOrderDetailByOrderIds(List<Long> orderIdS) {
+
+        List<OrderDetail> orderDetailList = new ArrayList<>();
+        for (Long orderId : orderIdS) {
+            OrderDetail record = new OrderDetail();
+            record.setOrderId(orderId);
+            orderDetailList.addAll(orderDetailMapper.select(record));
+        }
+
+        return orderDetailList;
     }
 }

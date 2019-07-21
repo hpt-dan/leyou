@@ -27,4 +27,5 @@ public interface GoodsService {
 
     void minusStock(Map<Long, Integer> cartMap);
 
+    void plusStock(Map<Long, Integer> cartMap);
 }

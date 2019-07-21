@@ -30,7 +30,12 @@ public enum ExceptionEnum {
     LOGIN_ERROR_NOT_FOUND(403,"您没有权限访问"),
     INVALID_SERVER_ID_SECRET(500,"服务器繁忙"),
     INVALID_TOKEN(403,"服务器验证失败"),
-    STOCK_NOT_ENOUGH(500,"库存不足")
+    STOCK_NOT_ENOUGH(500,"库存不足"),
+    ORDER_NOT_FOUND(204,"没有改订单"),
+    INVALID_ORDER_STATUS(500,"订单已经支付了"),
+    INVALID_NOTIFY_SIGN(500,"微信签名失败"),
+    INVALID_NOTIFY_PARAM(500,"金额不对"),
+    ORDER_NOT_FOND(500,"订单没有找到")
     ;
    
     private int status;

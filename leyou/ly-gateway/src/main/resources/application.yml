@@ -23,8 +23,9 @@ zuul:
     user-service: /user/**
     auth-service: /auth/**
     cart-service: /cart/**
-    order-service:
-      path: /order/**
+    order-service: /order/**
+    pay-service:
+      path: /pay/**
       serviceId: order-service
       strip-prefix: false
   sensitive-headers:
@@ -82,3 +83,4 @@ ly:
       - /api/user/check
       - /api/user/code
       - /api/item
+      - /api/pay

@@ -311,6 +311,7 @@ public class GoodsServiceImpl implements GoodsService {
      * 下单后减去商品更改商品的库存
      * @param cartMap
      */
+    @Transactional
     @Override
     public void minusStock(Map<Long, Integer> cartMap) {
 
@@ -326,6 +327,25 @@ public class GoodsServiceImpl implements GoodsService {
                 throw new LyException(ExceptionEnum.STOCK_NOT_ENOUGH);
             }
             sku.setStock(storeNum);
+
+            this.skuMapper.updateByPrimaryKeySelective(sku);
+        });
+    }
+
+
+
+    /**
+     * 添加库存
+     * @param cartMap
+     */
+    @Override
+    public void plusStock(Map<Long, Integer> cartMap) {
+
+        cartMap.entrySet().forEach(cart -> {
+            Long skuId = cart.getKey();
+            Integer num = cart.getValue();
+            Sku sku = skuMapper.selectByPrimaryKey(skuId);
+            sku.setStock(sku.getStock() + num);
 
             this.skuMapper.updateByPrimaryKeySelective(sku);
         });

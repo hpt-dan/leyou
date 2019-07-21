@@ -34,6 +34,12 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
+
+            String uri = request.getRequestURI();
+            if("/pay/wx/notify".equals(request.getRequestURI())){
+                return true;
+            }
+
             //获取token
             String token = CookieUtils.getCookieValue(request, prop.getUser().getCookieName());
             Payload<UserInfo> payload = JwtUtils.getInfoFromToken(token, prop.getPublicKey(), UserInfo.class);
@@ -50,6 +56,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+
         tl.remove();
     }
 

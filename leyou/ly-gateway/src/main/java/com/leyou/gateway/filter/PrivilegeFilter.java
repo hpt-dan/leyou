@@ -35,7 +35,6 @@ public class PrivilegeFilter extends ZuulFilter {
 
     /**
      * PRE_DECORATION_FILTER 是Zuul默认的处理请求头的过滤器，我们放到这个之后执行
-     *
      * @return 顺序
      */
     @Override

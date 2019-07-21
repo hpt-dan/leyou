@@ -135,4 +135,17 @@ public class GoodsController {
         goodsService.minusStock(cartMap);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
+    /**
+     * 加库存
+     * @param cartMap 商品id及数量的map  两个参数，skuId，要加的数量
+     */
+    @PutMapping("/stock/plus")
+    public ResponseEntity<Void> plusStock(@RequestBody Map<Long, Integer> cartMap) {
+        goodsService.plusStock(cartMap);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

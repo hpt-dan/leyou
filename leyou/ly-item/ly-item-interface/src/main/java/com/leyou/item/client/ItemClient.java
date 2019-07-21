@@ -121,4 +121,11 @@ public interface ItemClient {
     Void minusStock(@RequestBody Map<Long, Integer> cartMap);
 
 
+
+    /**
+     * 加库存
+     * @param cartMap 商品id及数量的map  两个参数，skuId，要加的数量
+     */
+    @PutMapping("/stock/plus")
+    Void plusStock(@RequestBody Map<Long, Integer> cartMap);
 }

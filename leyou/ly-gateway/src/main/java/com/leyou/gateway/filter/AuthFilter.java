@@ -65,7 +65,6 @@ public class AuthFilter extends ZuulFilter {
                 return false;
             }
         }
-
         return true;
     }
 

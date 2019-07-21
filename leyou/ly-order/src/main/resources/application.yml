@@ -8,6 +8,8 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: 192.168.11.128
 eureka:
   client:
     service-url:
@@ -29,6 +31,14 @@ ly:
       id: 6 # 服务id
       secret: ${spring.application.name} # 服务密钥，默认是服务的名称
       headerName: privilege_header
+
+  pay:
+    wx:
+      appID: wx8397f8696b538317
+      mchID: 1473426802
+      key: T6m9iK73b0kn9g5v426MKfHQH7X8rKwb
+      notifyUrl: http://bgqx9s.natappfree.cc/api/pay/wx/notify
+      tradeType: NATIVE
 
 
   worker:
