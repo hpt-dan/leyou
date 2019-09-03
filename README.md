@@ -191,19 +191,22 @@ B:在一定时间内访问20次，其中有10失败。服务则处于断开状�
 ## 7.5：springboot,SpringCloud项目架构的api
 ### 7.5.1：Springboot:
 #### 依赖
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.3.RELEASE</version>
-</parent>
+```
+<parent>  
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-starter-parent</artifactId>  
+    <version>2.1.3.RELEASE</version>  
+</parent>  
 
-
-<dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
- </dependency>
+  
+<dependency>  
+        <groupId>org.springframework.boot</groupId>  
+        <artifactId>spring-boot-starter-web</artifactId>  
+ </dependency>  
+ ```
 
 ### 7.5.2：配置文件
+```
 ly:
   jwt:
     pubKeyPath: D:/heima/rsa/id_rsa.pub # D:/heima/rsa/id_rsa.pub # 公钥地址
@@ -241,9 +244,10 @@ public class PrivilegeInterceptors implements RequestInterceptor {
         template.header(props.getApp().getHeaderName(), token);
     }
 }
-
+```
 #### 总结：
 配置文件值添加到属性类中，通过属性类中set方法，获取值通过get方法。
+```
 启动类
 @SpringBootApplication
 public class Application {
@@ -254,9 +258,10 @@ public class Application {
 //@SpringBootApplication：
 项目中导入依赖，自动配置。
 启动类包下全部被扫描，可以使用spring注解。
-
+```
 ### 7.5.3：拦截器(一个注解@configuration两个接口HandlerInterceptor，WebMvcConfigurer)
 #### 1：继承HandlerInterceptor
+```
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
     @Override  //请求到达controller之前。
@@ -274,7 +279,9 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.debug("afterCompletion method is now running!");
     }
 }
+```
 #### 2：拦截器添加
+```
 @Configuration
 public class MvcConfig implements WebMvcConfigurer{
  
@@ -285,24 +292,28 @@ public class MvcConfig implements WebMvcConfigurer{
         registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/**");
     }
 }
+```
 ### 7.5.4：集成mybatis
 #### a:导入依赖
+```
 <!-- 通用mapper -->
 <dependency>
     <groupId>tk.mybatis</groupId>
     <artifactId>mapper-spring-boot-starter</artifactId>
     <version>2.1.5</version>
 </dependency>
-
+```
 #### b:创建mapper
+```
 public interface UserMapper extends Mapper<User>{
 }
 在要操作的实体类上添加@Table(name = "tb_user")
-
+```
 #### c:开启mapper类扫描
 在启动类上添加@MapperScan("cn.itcast.mapper")
 
 #### d:配置yml文件
+```
 mybatis:
  	 # mybatis 查询的结构集封装
   	type-aliases-package=cn.itcast.pojo
@@ -311,47 +322,56 @@ mybatis:
   	# 驼峰映射 
   	configuration:
     		map-underscore-to-camel-case: true
-
+```
 ### 7.5.5：SpringCloud
 配置中心(可以配置多个，保证高可用，但是相互之间得注册)
 #### a:导入依赖
+```
 <dependency>
      <groupId>org.springframework.cloud</groupId>
      <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-</dependency>
-#### b:在引导类上添加@EnableEurekaServer
+</dependency>  
+```
+#### b:在引导类上添加@EnableEurekaServer  
 #### c:配置文件(如果是其他服务和注册中心之间的关系，和该配置类似。)
-eureka:
-  client:
-    service-url:
-      defaultZone: http://127.0.0.1:10086/eureka
+```
+eureka:  
+  client:  
+    service-url:  
+      defaultZone: http://127.0.0.1:10086/eureka  
     fetch-registry: false   //不从注册中心拉去服务
-    register-with-eureka: false  //不向注册中心注册服务
+    register-with-eureka: false  //不向注册中心注册服务  
+```
 ### 7.5.6：网关的配置
 #### a:导入依赖
-<dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
-</dependency>
+```
+<dependency>  
+      <groupId>org.springframework.cloud</groupId>  
+      <artifactId>spring-cloud-starter-netflix-zuul</artifactId>  
+</dependency>  
+```
 #### b:在启动类上添加@EnableZuulProxy
 #### c:配置yml文件的编写
-zuul:
-  prefix: /api # 添加路由前缀
-  routes:
-    item-service: /item/** # 将商品微服务映射到/item/**
-    upload-service: /upload/**
-    search-service: /search/**
-eureka:
-  client:
-    service-url:
-      defaultZone: http://127.0.0.1:10086/eureka
-
+```
+zuul:  
+  prefix: /api # 添加路由前缀  
+  routes:  
+    item-service: /item/** # 将商品微服务映射到/item/**  
+    upload-service: /upload/**  
+    search-service: /search/**  
+eureka:  
+  client:  
+    service-url:  
+      defaultZone: http://127.0.0.1:10086/eureka  
+```
 ### 7.5.7：服务之间的访问(A服务要调用别的服务)
 #### a:导入依赖(在调用者导入依赖,服务的接口也需要导入依赖)
+```
 <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
 </dependency>
+```
 #### b:在启动类添加注释@EnableFeignClients
 #### c:配置接口
 @FeignClient("user-service")
@@ -366,6 +386,7 @@ public interface UserClient {
 }
 #### d:直接调用和spring其他类中的对象一样
 ### 7.5.8：基于ZullFilter类的过滤器(登录校验)
+```
 @Component
 @EnableConfigurationProperties(JwtProperties.class)
 public class PrivilegeFilter extends ZuulFilter {
@@ -401,7 +422,7 @@ public class PrivilegeFilter extends ZuulFilter {
         return null;
     }
 }
-
+```
 ####总结：
 项目中的服务被网关访问的，则必须在yml文件配置路由，但如common模块只被别的服务依赖，page模块仅从消息队列获取消息，其他服务调用，发送消息模块，仅从消息队列接消息，注册中心是网关拉取服务的点，所以都不需要添加路由。
 项目中服务需要被别的服务访问，或者自己访问别的服务访问，或者网关进行访问，则需要配置配置中心。
